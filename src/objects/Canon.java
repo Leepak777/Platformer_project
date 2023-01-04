@@ -1,5 +1,4 @@
-package Objects;
-import static utilz.Constants.ObjectsConstants.*;
+package objects;
 
 import main.GamePanel;
 

@@ -4,13 +4,13 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import Objects.Canon;
-import Objects.GameContainer;
-import Objects.Potion;
-import Objects.Spike;
+import objects.Canon;
+import objects.GameContainer;
+import objects.Potion;
+import objects.Spike;
 
 import static utilz.HelpMethods.*;
-import entities.Crabby;
+
 import entities.Enemy;
 import gamestates.Play;
 import main.GamePanel;

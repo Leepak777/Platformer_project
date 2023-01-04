@@ -5,20 +5,17 @@ import static utilz.Constants.EnemyConstants.CRABBY;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Float;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import Objects.Canon;
-import Objects.GameContainer;
-import Objects.Potion;
-import Objects.Projectile;
-import Objects.Spike;
+import objects.Canon;
+import objects.GameContainer;
+import objects.Potion;
+import objects.Projectile;
+import objects.Spike;
 import entities.Crabby;
 import entities.Enemy;
-import entities.Player;
 import gamestates.Play;
-import main.Game;
 import main.GamePanel;
 import static utilz.Constants.ObjectsConstants.*;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9738507e-15ad-4e07-a209-5099a56a00a6" name="Changes" comment="" />
+    <list default="true" id="9738507e-15ad-4e07-a209-5099a56a00a6" name="Changes" comment="testing push" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -54,6 +54,14 @@
       <option name="presentableId" value="Default" />
       <updated>1672806628409</updated>
     </task>
+    <task id="LOCAL-00001" summary="testing push">
+      <created>1672806845308</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1672806845308</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -66,5 +74,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="testing push" />
+    <option name="LAST_COMMIT_MESSAGE" value="testing push" />
   </component>
 </project>

@@ -1,4 +1,4 @@
-package Objects;
+package objects;
 
 import static utilz.Constants.ObjectsConstants.*;
 import static utilz.HelpMethods.*;
