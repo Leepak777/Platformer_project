@@ -3,6 +3,7 @@ package main;
 import java.awt.*;
 import javax.swing.JPanel;
 
+import audio.AudioPlayer;
 import gamestates.*;
 import gamestates.Menu;
 import inputs.KeyboardInputs;
@@ -18,6 +19,7 @@ public class GamePanel extends JPanel {
 	private Menu menu;
 	private AudioOptions audioOp;
 	private GameOptions gameOp;
+	private AudioPlayer audioPlay;
 	public final static int TILE_DEFAULT_SIZE = 32;
 	public static float SCALE = 1.5f;
 	public static final int TILES_IN_WIDTH = 26;
@@ -34,6 +36,7 @@ public class GamePanel extends JPanel {
 		mouseInputs = new MouseInputs(this);
 		key = new KeyboardInputs(this);
 		gameOp = new GameOptions(this);
+		audioPlay = new AudioPlayer();
 		setPanelSize();
 		addKeyListener(key);
 		addMouseListener(mouseInputs);
@@ -121,5 +124,10 @@ public class GamePanel extends JPanel {
 	public gamestates.Menu getMenu() {
 		return menu;
 	}
+
+	public AudioPlayer getAudioPlay() {
+		return audioPlay;
+	}
+	
 
 }

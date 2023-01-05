@@ -73,6 +73,10 @@ public class LevelManager {
 		return lvls.size();
 	}
 
+	public int getLvlIndex() {
+		return lvlIndex;
+	}
+
 	public void loadNextLevel() {
 		lvlIndex++;
 		if (lvlIndex >= lvls.size()) {
