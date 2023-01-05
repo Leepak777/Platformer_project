@@ -7,6 +7,7 @@ import gamestates.*;
 import gamestates.Menu;
 import inputs.KeyboardInputs;
 import inputs.MouseInputs;
+import ui.AudioOptions;
 
 public class GamePanel extends JPanel {
 
@@ -15,7 +16,8 @@ public class GamePanel extends JPanel {
 	private Game game;
 	private Play play;
 	private Menu menu;
-
+	private AudioOptions audioOp;
+	private GameOptions gameOp;
 	public final static int TILE_DEFAULT_SIZE = 32;
 	public static float SCALE = 1.5f;
 	public static final int TILES_IN_WIDTH = 26;
@@ -25,11 +27,13 @@ public class GamePanel extends JPanel {
 	public static final int GAME_HEIGHT = TILE_SIZE * TILES_IN_HEIGHT;
 
 	public GamePanel(Game game) {
+		audioOp = new AudioOptions();
 		this.game = game;
 		play = new Play(this);
 		menu = new Menu(this);
 		mouseInputs = new MouseInputs(this);
 		key = new KeyboardInputs(this);
+		gameOp = new GameOptions(this);
 		setPanelSize();
 		addKeyListener(key);
 		addMouseListener(mouseInputs);
@@ -53,6 +57,8 @@ public class GamePanel extends JPanel {
 			play.update();
 			break;
 		case OPTIONS:
+			gameOp.update();
+			break;
 		case QUIT:
 		default:
 			System.exit(0);
@@ -70,6 +76,9 @@ public class GamePanel extends JPanel {
 			break;
 		case PLAYING:
 			play.draw(g);
+			break;
+		case OPTIONS:
+			gameOp.draw(g);
 			break;
 		default:
 			break;
@@ -95,6 +104,14 @@ public class GamePanel extends JPanel {
 			play.getPlayer().resetDirBooleans();
 		}
 
+	}
+
+	public GameOptions getGameOp() {
+		return gameOp;
+	}
+
+	public AudioOptions getAudioOp() {
+		return audioOp;
 	}
 
 	public Play getPlay() {

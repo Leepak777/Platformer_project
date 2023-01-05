@@ -22,6 +22,9 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
 			gp.getPlay().mouseDragged(e);
 			break;
 		case MENU:
+		case OPTIONS:
+			gp.getGameOp().mouseDragged(e);
+			break;
 		default:
 			break;
 
@@ -33,11 +36,12 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
 		switch (GameState.state) {
 		case MENU:
 			gp.getMenu().mouseMoved(e);
-			;
 			break;
 		case PLAYING:
 			gp.getPlay().mouseMoved(e);
-			;
+			break;
+		case OPTIONS:
+			gp.getGameOp().mouseMoved(e);
 			break;
 		default:
 			break;
@@ -50,11 +54,12 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
 		switch (GameState.state) {
 		case MENU:
 			gp.getMenu().mouseClicked(e);
-			;
 			break;
 		case PLAYING:
 			gp.getPlay().mouseClicked(e);
-			;
+			break;
+		case OPTIONS:
+			gp.getGameOp().mouseClicked(e);
 			break;
 		default:
 			break;
@@ -67,11 +72,12 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
 		switch (GameState.state) {
 		case MENU:
 			gp.getMenu().mousePressed(e);
-			;
 			break;
 		case PLAYING:
 			gp.getPlay().mousePressed(e);
-			;
+			break;
+		case OPTIONS:
+			gp.getGameOp().mousePressed(e);
 			break;
 		default:
 			break;
@@ -84,11 +90,12 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
 		switch (GameState.state) {
 		case MENU:
 			gp.getMenu().mouseReleased(e);
-			;
 			break;
 		case PLAYING:
 			gp.getPlay().mouseReleased(e);
-			;
+			break;
+		case OPTIONS:
+			gp.getGameOp().mouseReleased(e);
 			break;
 		default:
 			break;
