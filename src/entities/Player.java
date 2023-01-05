@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import audio.AudioPlayer;
 import gamestates.Play;
 
 import static utilz.Constants.PlayerConstants.*;
@@ -80,8 +81,11 @@ public class Player extends Entity {
 				aniTick = 0;
 				aniIndex = 0;
 				play.setPlayerDying(true);
+				play.getGame().getAudioPlay().playEffect(AudioPlayer.DIE);
 			} else if (aniIndex == GetSpriteAmount(DEAD) - 1 && aniTick >= ANISPEED - 1) {
 				play.setGameOver(true);
+				play.getGame().getAudioPlay().stopSong();
+				play.getGame().getAudioPlay().playEffect(AudioPlayer.GAMEOVER);
 			} else {
 				updateAnimationTick();
 			}
@@ -89,7 +93,8 @@ public class Player extends Entity {
 		}
 		if (!onFloor(hitbox, lvlData)) {
 			inAir = true;
-		} else if (!fallMove) {
+		} 
+		if (onFloor(hitbox, lvlData) && !fallMove) {
 			fallMove = true;
 		}
 		updateAttackBox(play.getxLvlOffset(), play.getyLvlOffset());
@@ -221,6 +226,7 @@ public class Player extends Entity {
 		attackCheck = true;
 		play.checkEnemyHit(attackbox, 50);
 		play.checkObjectHit(attackbox);
+		play.getGame().getAudioPlay().playAttack();;
 	}
 
 	private void updateAttackBox(int xLvlOffset, int yLvlOffset) {
@@ -341,12 +347,12 @@ public class Player extends Entity {
 				return;
 			}
 		}
-		if (state == FALLING && !fallMove) {
+		/*if (state == FALLING && !fallMove) {
 			flipH = -1;
 			flipY = height;
 		} else {
 			flip();
-		}
+		}*/
 		float xSpeed = 0;
 		if (left) {
 			xSpeed -= walkSpeed;
@@ -390,6 +396,7 @@ public class Player extends Entity {
 		if (inAir) {
 			return;
 		}
+		play.getGame().getAudioPlay().playEffect(AudioPlayer.JUMP);
 		inAir = true;
 		airSpeed = jumpSpeed_act;
 	}
@@ -515,6 +522,8 @@ public class Player extends Entity {
 		hakiAttack = false;
 		state = IDLE;
 		currentHealth = maxHealth;
+		fallMove =true;
+		bounce = false;
 		hitbox.x = x;
 		hitbox.y = y;
 		if (!onFloor(hitbox, lvlData) && !isOnEntity(hitbox, play.getEnemylst())) {

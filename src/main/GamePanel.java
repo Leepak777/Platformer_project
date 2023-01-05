@@ -29,7 +29,7 @@ public class GamePanel extends JPanel {
 	public static final int GAME_HEIGHT = TILE_SIZE * TILES_IN_HEIGHT;
 
 	public GamePanel(Game game) {
-		audioOp = new AudioOptions();
+		audioOp = new AudioOptions(this);
 		this.game = game;
 		play = new Play(this);
 		menu = new Menu(this);

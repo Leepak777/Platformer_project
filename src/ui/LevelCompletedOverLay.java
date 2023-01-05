@@ -72,12 +72,12 @@ public class LevelCompletedOverLay {
 		if (isIn(e, nextB)) {
 			if (nextB.isMousePressed()) {
 				play.loadNextLevel();
+				play.getGame().getAudioPlay().setLevelSong(play.getLevelM().getLvlIndex());
 			}
 		} else if (isIn(e, menuB)) {
 			if (menuB.isMousePressed()) {
 				play.resetAll();
-				GameState.state = GameState.MENU;
-				System.out.println("MENU");
+				play.setGameState(GameState.MENU);
 			}
 		}
 		menuB.resetBools();
@@ -90,6 +90,5 @@ public class LevelCompletedOverLay {
 		} else if (isIn(e, menuB)) {
 			menuB.setMousePressed(true);
 		}
-
 	}
 }

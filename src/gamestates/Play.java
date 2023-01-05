@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
+import audio.AudioPlayer;
 import objects.ObjectManager;
 import entities.Crabby;
 import entities.Enemy;
@@ -395,7 +396,15 @@ public class Play extends State implements StateMethods {
 
 	public void setLevelCompleted(boolean b) {
 		this.lvlCompleted = b;
+		if(b) {
+			lvlCompleted();
+		}
 
+	}
+
+	private void lvlCompleted() {
+		gp.getAudioPlay().stopSong();
+		gp.getAudioPlay().playEffect(AudioPlayer.LVL_COMPLETED);
 	}
 
 	public ObjectManager getOM() {

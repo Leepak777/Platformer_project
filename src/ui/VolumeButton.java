@@ -13,7 +13,7 @@ public class VolumeButton extends PauseButton {
 	private int index = 0;
 	private boolean mouseOver, mousePressed;
 	private int buttonX, minX, maxX;
-
+	private float floatVal;
 	public VolumeButton(int x, int y, int width, int height) {
 		super(x + width / 2, y, VOLUME_WIDTH, height);
 		bounds.x -= VOLUME_WIDTH / 2;
@@ -59,7 +59,15 @@ public class VolumeButton extends PauseButton {
 		} else {
 			buttonX = x;
 		}
+		updateFloatVal();
 		bounds.x = buttonX - VOLUME_WIDTH / 2;
+	}
+
+	private void updateFloatVal() {
+		float range = maxX - minX;
+		float value = buttonX - minX;
+		floatVal = value / range;
+		
 	}
 
 	public void resetBools() {
@@ -81,5 +89,9 @@ public class VolumeButton extends PauseButton {
 
 	public void setMousePressed(boolean mousePressed) {
 		this.mousePressed = mousePressed;
+	}
+
+	public float getFloatval() {
+		return floatVal;
 	}
 }
