@@ -20,7 +20,9 @@ public class Projectile {
 		hitbox = new Rectangle2D.Float(x + xOffset,y + yOffset,BALL_WIDTH,BALL_HEIGHT);
 		this.dir = dir;
 	}
-	
+	public void changeDir() {
+		dir*=-1;
+	}
 	public void updatePos() {
 		hitbox.x += dir * SPEED;
 	}

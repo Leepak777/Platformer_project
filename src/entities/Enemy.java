@@ -22,6 +22,8 @@ public abstract class Enemy extends Entity {
 
 	protected boolean active = true;
 	protected boolean attackCheck;
+	
+	protected boolean dead = false;
 
 	public Enemy(float x, float y, int width, int height, int enemyType, Play play) {
 		super(x, y, width, height, play);
@@ -73,9 +75,10 @@ public abstract class Enemy extends Entity {
 
 	public void hurt(int amount) {
 		currentHealth -= amount;
-		if (currentHealth <= 0) {
+		if (currentHealth <= 0 && !dead) {
 			newState(DEAD);
-		} else {
+			dead = true;
+		} else if( currentHealth > 0){
 			newState(HIT);
 		}
 	}
@@ -131,6 +134,7 @@ public abstract class Enemy extends Entity {
 				case ATTACK, HIT -> state = IDLE;
 				case DEAD -> active = false;
 				}
+				
 
 			}
 		}
@@ -154,6 +158,7 @@ public abstract class Enemy extends Entity {
 		hitbox.y = y;
 		firstUpdate = true;
 		currentHealth = maxHealth;
+		dead=false;
 		newState(IDLE);
 		active = true;
 		airSpeed = 0;

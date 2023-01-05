@@ -63,7 +63,7 @@ public class EnemyManager {
 									(int) (crabby.getHitbox().x) - xLvlOffset - CRABBY_DRAWOFFSET_X + crabby.flipX(),
 									(int) (crabby.getHitbox().y) - yLvlOffset - CRABBY_DRAWOFFSET_Y, CRABBY_WIDTH * crabby.flipW(),
 									CRABBY_HEIGHT, null);
-							// c.drawHitBox(g, 0, xLvlOffset, yLvlOffset);
+							 c.drawHitBox(g, 0, xLvlOffset, yLvlOffset);
 						}
 				}
 			}
@@ -76,7 +76,7 @@ public class EnemyManager {
 			if (c.isActive()) {
 				if (attackbox.intersects(c.getHitbox()) || attackbox.contains(c.getHitbox())) {
 					c.hurt(amount);
-					System.out.println(amount);
+					//System.out.println(amount);
 				}
 			}
 		}

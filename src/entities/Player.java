@@ -2,7 +2,6 @@ package entities;
 
 import main.GamePanel;
 
-
 import static utilz.Constants.*;
 import static utilz.Constants.PlayerConstants;
 import static utilz.HelpMethods.*;
@@ -50,12 +49,17 @@ public class Player extends Entity {
 	// player left right flip
 	private int flipX = 0;
 	private int flipW = 1;
+	private int flipY = 0;
+	private int flipH = 1;
 	// Check if can attack
 	private boolean attackCheck, hakiattackCheck;
 	private int hakiDmg = 2;
-	
+
 	private int spikeTick = 0;
 	private int tileY = 0;
+	private boolean bounce = false;
+	private boolean fallMove = true;
+
 	public Player(float x, float y, int width, int height, Play play) {
 		super(x, y, width, height, play);
 		this.state = IDLE;
@@ -71,34 +75,33 @@ public class Player extends Entity {
 		spikeTick++;
 		updateHealthBar();
 		if (currentHealth <= 0) {
-			if(state != DEAD) {
+			if (state != DEAD) {
 				state = DEAD;
 				aniTick = 0;
 				aniIndex = 0;
 				play.setPlayerDying(true);
-			}
-			else if(aniIndex == GetSpriteAmount(DEAD) - 1 && aniTick >= ANISPEED -1) {
+			} else if (aniIndex == GetSpriteAmount(DEAD) - 1 && aniTick >= ANISPEED - 1) {
 				play.setGameOver(true);
-			}
-			else {
+			} else {
 				updateAnimationTick();
 			}
 			return;
 		}
 		if (!onFloor(hitbox, lvlData)) {
 			inAir = true;
+		} else if (!fallMove) {
+			fallMove = true;
 		}
 		updateAttackBox(play.getxLvlOffset(), play.getyLvlOffset());
-		if (isOnEntity(hitbox, play.getEnemylst())) {
+		if (isOnEntity(hitbox, play.getEnemylst()) && fallMove) {
 			jump = true;
 		}
-
 		updatePos();
-		if(moving) {
+		if (moving) {
 			tileY = (int) (hitbox.y / GamePanel.TILE_SIZE);
 			checkPotionTouched();
 		}
-		if(spikeTick >=100) {
+		if (spikeTick >= 100) {
 			checkSpikesTouch();
 			spikeTick = 0;
 		}
@@ -116,7 +119,7 @@ public class Player extends Entity {
 
 	private void checkSpikesTouch() {
 		play.checkSpikesTouched();
-		
+
 	}
 
 	private void checkPotionTouched() {
@@ -124,6 +127,19 @@ public class Player extends Entity {
 	}
 
 	public void render(Graphics g, int xLvlOffset, int yLvlOffset) {
+		if (hakiattackCheck) {
+			drawHaki(g, xLvlOffset, yLvlOffset);
+		}
+
+		g.drawImage(animations[state][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX,
+				(int) (hitbox.y - yDrawOffset) - yLvlOffset + flipY, width * flipW, height * flipH, null);
+		// drawAttackBox(g,xLvlOffset,yLvlOffset);
+		 drawBox(g, xLvlOffset, yLvlOffset, jumpbox);
+		// drawHitBox(g, 0, xLvlOffset, yLvlOffset);
+		drawUI(g);
+	}
+
+	private void drawHaki(Graphics g, int xLvlOffset, int yLvlOffset) {
 		if (jumptick > 0 && jumptick < 7) {
 			hakiDmg = 2;
 			g.drawImage(haki[0][hakiIndex], (int) (hitbox.x - xDrawOffset / 1.5) - xLvlOffset,
@@ -148,13 +164,6 @@ public class Player extends Entity {
 					(int) (hitbox.y - yDrawOffset * 6.9) - yLvlOffset, (int) (hitbox.width * 2.5),
 					(int) (hitbox.height * 2), null);
 		}
-
-		g.drawImage(animations[state][aniIndex], (int) (hitbox.x - xDrawOffset) - xLvlOffset + flipX,
-				(int) (hitbox.y - yDrawOffset) - yLvlOffset, width * flipW, height, null);
-		// drawAttackBox(g,xLvlOffset,yLvlOffset);
-		// drawBox(g, xLvlOffset, yLvlOffset, jumpbox);
-		// drawHitBox(g, 0, xLvlOffset, yLvlOffset);
-		drawUI(g);
 	}
 
 	public void setSpawn(Point spawn) {
@@ -167,7 +176,7 @@ public class Player extends Entity {
 	private void initAttackBox() {
 		attackbox = new Rectangle2D.Float(x, y, (int) (20 * GamePanel.SCALE), (int) (20 * GamePanel.SCALE));
 		hakibox = new Rectangle2D.Float(x, y, (int) (hitbox.width * 2.5), (int) (hitbox.height * 2));
-		jumpbox = new Rectangle2D.Float(x, y, (int) (hitbox.width), (int) (hitbox.height / 1.5));
+		jumpbox = new Rectangle2D.Float(x+hitbox.width/6, y+5, (int) (hitbox.width/1.5), (int) (hitbox.height / 1.6));
 	}
 
 	private void loadAnimations() {
@@ -222,8 +231,8 @@ public class Player extends Entity {
 		}
 		hakibox.x = (int) (hitbox.x - xDrawOffset / 1.5);
 		hakibox.y = (int) (hitbox.y - yDrawOffset * 6.9);
-		jumpbox.x = (int) (hitbox.x);
-		jumpbox.y = (int) (hitbox.y + hitbox.height);
+		jumpbox.x = (int) (hitbox.x+hitbox.width/6);
+		jumpbox.y = (int) (hitbox.y + hitbox.height + 5);
 
 		attackbox.y = hitbox.y + (int) (GamePanel.SCALE * 10);
 	}
@@ -235,7 +244,7 @@ public class Player extends Entity {
 
 	public void updateJumpTick() {
 		increaseJumpTick();
-		jumpSpeed_act -= 0.0569420f ;
+		jumpSpeed_act -= 0.0569420f;
 	}
 
 	private void drawUI(Graphics g) {
@@ -244,20 +253,36 @@ public class Player extends Entity {
 		g.fillRect(healthBar_X + statusBar_X, healthBar_Y + statusBar_Y, healthWidth, healthBar_HEIGHT);
 	}
 
-	private void updateAnimationTick() {
+	private void updateAnimationTick() {	
 		aniTick++;
 		if (aniTick >= ANISPEED) {
 			aniTick = 0;
 			aniIndex++;
-			if (state == FALLING || state == IDLE) {
+			if (fallMove && (state == FALLING || state == IDLE)) {
 				play.checkEnemyHit(jumpbox, 5);
 				play.checkObjectHit(jumpbox);
 			}
 			if (aniIndex >= GetSpriteAmount(state)) {
 				aniIndex = 0;
 				attacking = false;
+				if (state == FALLING) {
+					fallingCheck();
+				}
+
 				jump = false;
 				attackCheck = false;
+
+			}
+		}
+	}
+
+	private void fallingCheck() {
+		if ((play.getCode2() > 0 && jump && (right || left)) || bounce) {
+			bounce = false;
+			if (left) {
+				left = false;
+			} else {
+				right = false;
 			}
 		}
 	}
@@ -316,6 +341,12 @@ public class Player extends Entity {
 				return;
 			}
 		}
+		if (state == FALLING && !fallMove) {
+			flipH = -1;
+			flipY = height;
+		} else {
+			flip();
+		}
 		float xSpeed = 0;
 		if (left) {
 			xSpeed -= walkSpeed;
@@ -327,6 +358,7 @@ public class Player extends Entity {
 			flipX = 0;
 			flipW = 1;
 		}
+
 		if (!inAir) {
 			if (!onFloor(hitbox, lvlData)) {
 				inAir = true;
@@ -369,15 +401,35 @@ public class Player extends Entity {
 	}
 
 	private void updateXPos(float xSpeed) {
+		if (state == FALLING && !fallMove) {
+			return;
+		}
 		if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData)
 				&& !isEntityX(hitbox, xSpeed, play.getEnemylst())) {
 			hitbox.x += xSpeed;
-		} else { 
-			if(isEntityX(hitbox, xSpeed, play.getEnemylst())){
-				hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed,true);
+		} else {
+			checkBounce(xSpeed);
+			if (isEntityX(hitbox, xSpeed, play.getEnemylst())) {
+				hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed, true);
+			} else {
+				hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed, false);
 			}
-			else {
-			hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed, false);}
+		}
+	}
+
+	private void checkBounce(float xSpeed) {
+		if (!CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData) && state == JUMP) {
+			jump = true;
+			bounce = true;
+			fallMove = false;
+			if (left) {
+				right = true;
+				left = false;
+			} else {
+				right = false;
+				left = true;
+			}
+			return;
 		}
 	}
 
@@ -390,35 +442,47 @@ public class Player extends Entity {
 		}
 
 	}
+
 	public void changePower(int bluePotionValue) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	public void setAttacking(boolean b) {
 		attacking = b;
 	}
 
+	public void setFall() {
+		state = FALLING;
+	}
+	public void flip() {
+		flipY = 0;
+		flipH = 1;
+	}
 	public void setDirection(int code, boolean directionOn) {
 		switch (code) {
-			case KeyEvent.VK_A: {
-				left = directionOn;
-				break;
-			}
-			case KeyEvent.VK_D: {
-				right = directionOn;
-				break;
-			}
-			case KeyEvent.VK_SPACE: {
-				jump = directionOn;
-				break;
-			}
+		case KeyEvent.VK_A: {
+			left = directionOn;
+			break;
+		}
+		case KeyEvent.VK_D: {
+			right = directionOn;
+			break;
+		}
+		case KeyEvent.VK_SPACE: {
+			jump = directionOn;
+			break;
+		}
 		}
 
 	}
 
-
 	public void setHakiAttack(boolean attack) {
 		hakiAttack = attack;
+	}
+
+	public void setFallMove(boolean fallMove) {
+		this.fallMove = fallMove;
 	}
 
 	public void setHakiattackCheck(boolean hakiattackCheck) {
@@ -494,6 +558,8 @@ public class Player extends Entity {
 		return tileY;
 	}
 
-	
+	public boolean isHakiAttack() {
+		return hakiAttack;
+	}
 
 }

@@ -2,9 +2,12 @@ package utilz;
 
 import static utilz.Constants.EnemyConstants.CRABBY;
 
+
+
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Float;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -15,8 +18,12 @@ import objects.Projectile;
 import objects.Spike;
 import entities.Crabby;
 import entities.Enemy;
+import entities.Player;
 import gamestates.Play;
+import main.Game;
 import main.GamePanel;
+import objects.Projectile;
+
 import static utilz.Constants.ObjectsConstants.*;
 
 public class HelpMethods {
@@ -65,6 +72,7 @@ public class HelpMethods {
 
 			}
 		}
+		
 		return false;
 	}
 

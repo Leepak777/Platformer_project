@@ -1,6 +1,7 @@
 package levels;
 
 import java.awt.Point;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -10,7 +11,7 @@ import objects.Potion;
 import objects.Spike;
 
 import static utilz.HelpMethods.*;
-
+import entities.Crabby;
 import entities.Enemy;
 import gamestates.Play;
 import main.GamePanel;

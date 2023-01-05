@@ -2,19 +2,23 @@ package gamestates;
 
 import java.awt.Color;
 
+
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Float;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
 import objects.ObjectManager;
+import entities.Crabby;
 import entities.Enemy;
 import entities.EnemyManager;
 import entities.Player;
 import levels.LevelManager;
+import main.Game;
 import main.GamePanel;
 import ui.GameOverOverLay;
 import ui.LevelCompletedOverLay;
@@ -45,7 +49,8 @@ public class Play extends State implements StateMethods {
 	private boolean gameOver;
 	private boolean lvlCompleted = false;
 	private boolean playerDying = false;
-
+	private boolean holdSpace = false;
+	private int code2;
 	public Play(GamePanel gp) {
 		super(gp);
 		initClasses();
@@ -96,14 +101,11 @@ public class Play extends State implements StateMethods {
 			pauseOverlay.update();
 		} else if (lvlCompleted) {
 			levelcompletedOverLay.update();
-		}
-		else if(gameOver) {
+		} else if (gameOver) {
 			gameoverOverlay.update();
-		}
-		else if(playerDying) {
+		} else if (playerDying) {
 			player.update();
-		}
-		else if (!gameOver) {
+		} else if (!gameOver) {
 			levelM.update();
 			player.update();
 			EM.update(levelM.getCurrentLevel().getLevelData(), player);
@@ -179,9 +181,10 @@ public class Play extends State implements StateMethods {
 		if (!gameOver) {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				player.setAttacking(true);
+				player.resetJumpTick();
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -192,8 +195,7 @@ public class Play extends State implements StateMethods {
 			} else if (lvlCompleted) {
 				levelcompletedOverLay.mousePressed(e);
 			}
-		}
-		else {
+		} else {
 			gameoverOverlay.mousePressed(e);
 		}
 	}
@@ -206,8 +208,7 @@ public class Play extends State implements StateMethods {
 			} else if (lvlCompleted) {
 				levelcompletedOverLay.mouseReleased(e);
 			}
-		}
-		else {
+		} else {
 			gameoverOverlay.mouseReleased(e);
 		}
 	}
@@ -220,8 +221,7 @@ public class Play extends State implements StateMethods {
 			} else if (lvlCompleted) {
 				levelcompletedOverLay.mouseMoved(e);
 			}
-		}
-		else {
+		} else {
 			gameoverOverlay.mouseMoved(e);
 		}
 	}
@@ -233,31 +233,51 @@ public class Play extends State implements StateMethods {
 		} else {
 			int code = e.getKeyCode();
 			if (code == KeyEvent.VK_A || code == KeyEvent.VK_D) {
-				player.setHakiAttack(false);
+				if(holdSpace) {
+					player.updateJumpTick();
+					code2 = code;
+					passTickAct();
+					return;
+				}
 				player.setDirection(code, true);
 			}
 			if (code == KeyEvent.VK_ESCAPE) {
 				paused = true;
 			}
 			if (code == KeyEvent.VK_SPACE) {
-				player.setHakiAttack(true);
-
-				player.updateJumpTick();
-				if (player.getJumpTick() > 30) {
-					player.setDirection(code, true);
-					player.resetJumpTick();
-					System.out.println(player.getJumpSpeed());
-					player.setpassTick(true);
+				player.flip();
+				holdSpace = true;
+				if(code2 != 0) {
+					player.setDirection(code2, false);
 				}
+				if(!player.isHakiAttack()) {
+					player.setHakiAttack(true);
+				}
+				player.setHakiAttack(true);
+				//System.out.println(player.getJumpTick());
+				player.updateJumpTick();
+				passTickAct();
 				if (player.getpassTick()) {
 					player.setHakiAttack(false);
-
 					player.resetJumpTick();
 				}
 
 			}
+			
 		}
 
+	}
+	
+	private void passTickAct() {
+		if (player.getJumpTick() > 30 && !player.getpassTick()) {
+			if(code2 != 0 && (code2 == KeyEvent.VK_A ||code2 == KeyEvent.VK_D)) {
+				player.setDirection(code2, true);
+			}
+			player.setDirection(KeyEvent.VK_SPACE, true);
+			player.resetJumpTick();
+			//System.out.println(player.getJumpSpeed());
+			player.setpassTick(true);
+		}
 	}
 
 	@Override
@@ -265,15 +285,21 @@ public class Play extends State implements StateMethods {
 		int code = e.getKeyCode();
 		if (!gameOver) {
 			if (code == KeyEvent.VK_A || code == KeyEvent.VK_D) {
+				code2 = 0;
 				player.setDirection(code, false);
-			} else if (code == KeyEvent.VK_SPACE) {
-
-				player.setHakiAttack(false);
+			}
+			if (code == KeyEvent.VK_SPACE) {
+				holdSpace = false;
+				if(player.isHakiAttack()) {
+					player.setHakiAttack(false);
+				}
 				if (!player.getpassTick() && player.getJumpTick() > 0) {
-
+					if(code2 != 0 && (code2 == KeyEvent.VK_A ||code2 == KeyEvent.VK_D)) {
+						player.setDirection(code2, true);
+					}
 					player.setDirection(code, true);
 					player.resetJumpTick();
-					System.out.println(player.getJumpSpeed());
+					//System.out.println(player.getJumpSpeed());
 				} else {
 					player.resetJumpTick();
 					player.setpassTick(false);
@@ -317,19 +343,23 @@ public class Play extends State implements StateMethods {
 		OM.resetAllObject();
 
 	}
+
 	public void checkObjectHit(Rectangle2D.Float attackbox) {
-		OM.checkObjectHit(attackbox);		
+		OM.checkObjectHit(attackbox);
 	}
+
 	public void checkEnemyHit(Rectangle2D.Float attackbox, int amount) {
 		EM.CheckEnemyHit(attackbox, amount);
 	}
+
 	public void checkPotionTouched(Rectangle2D.Float hitbox) {
 		OM.checkObjectTouched(hitbox);
-		
+
 	}
+
 	public void checkSpikesTouched() {
 		OM.checkSpikesTouch(player);
-		
+
 	}
 
 	public int getxLvlOffset() {
@@ -373,14 +403,12 @@ public class Play extends State implements StateMethods {
 	}
 
 	public void setPlayerDying(boolean b) {
-		this.playerDying  = b;
-		
+		this.playerDying = b;
+
 	}
 
-	
-
-	
-
-	
+	public int getCode2() {
+		return code2;
+	}
 
 }

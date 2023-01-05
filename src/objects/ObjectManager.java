@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import entities.Enemy;
 import entities.Player;
 import gamestates.Play;
 import levels.Level;
@@ -74,6 +75,30 @@ public class ObjectManager {
 				}
 			}
 		}
+		for (Projectile p : balls) {
+			if (p.isActive() ) {
+				if (p.getHitbox().intersects(attackbox)) {
+					p.changeDir();
+					return;
+				}
+			}
+		}
+	}
+
+	public ArrayList<GameContainer> getContainers() {
+		return containers;
+	}
+
+	public ArrayList<Spike> getSpikes() {
+		return spikes;
+	}
+
+	public ArrayList<Canon> getCanons() {
+		return canons;
+	}
+
+	public ArrayList<Projectile> getBalls() {
+		return balls;
 	}
 
 	private void loagImgs() {
@@ -113,18 +138,32 @@ public class ObjectManager {
 			}
 		}
 		updateCanons(play.getLevelM().getCurrentLevel().getLevelData(), play.getPlayer());
-		updateProjectiles(play.getLevelM().getCurrentLevel().getLevelData(), play.getPlayer());
+		updateProjectiles(play.getLevelM().getCurrentLevel().getLevelData(), play.getPlayer(), play.getEnemylst());
 	}
 
-	private void updateProjectiles(int[][] levelData, Player player) {
+	private void checkHitEn(Projectile b, ArrayList<Enemy> en) {
+		for(Enemy e: en) {
+			if(e.isActive()) {
+				if(e.getHitbox().intersects(b.getHitbox())) {
+					e.hurt(100);
+					b.setActive(false);
+				}
+			}
+		}
+	}
+	private void updateProjectiles(int[][] levelData, Player player, ArrayList<Enemy> en) {
 		for (Projectile b : balls) {
 			if (b.isActive()) {
 				b.updatePos();
 				if (b.getHitbox().intersects(player.getHitbox())) {
 					player.changeHealthint(-10);
+					player.setFallMove(false);
+					player.setFall();
 					b.setActive(false);
 				} else if (IsBallHittingLevel(b, levelData)) {
 					b.setActive(false);
+				}else {
+					checkHitEn(b, en);
 				}
 			}
 
@@ -239,6 +278,7 @@ public class ObjectManager {
 						(int) (gc.getHitbox().x - gc.getxDrawOffset() - xLvlOffset),
 						(int) (gc.getHitbox().y - gc.getyDrawOffset() - yLvlOffset), CONTAINER_WIDTH, CONTAINER_HEIGHT,
 						null);
+				gc.drawHitBox(g, type, xLvlOffset, yLvlOffset);
 			}
 		}
 
