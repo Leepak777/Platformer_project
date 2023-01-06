@@ -1,5 +1,10 @@
 package entities;
 
+import static utilz.Constants.Directions.DOWN;
+import static utilz.Constants.Directions.LEFT;
+import static utilz.Constants.Directions.UP;
+import static utilz.HelpMethods.CanMoveHere;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -23,6 +28,9 @@ public abstract class Entity {
 	protected Rectangle2D.Float attackbox, hakibox, jumpbox;
 	protected float walkSpeed;
 	protected Play play;
+	protected int pushBackDir;
+	protected float pushDrawOffset;
+	protected int pushBackOffsetDir = UP;
 
 	public Entity(float x, float y, int width, int height, Play play) {
 		this.x = x;
@@ -32,7 +40,33 @@ public abstract class Entity {
 		this.play = play;
 	}
 
-	protected void drawHitBox(Graphics g, int grade, int xLvlOffset, int yLvlOffset) {
+	protected void updatePushBackDrawOffset() {
+		float speed = 0.95f;
+		float limit = -30f;
+
+		if (pushBackOffsetDir == UP) {
+			pushDrawOffset -= speed;
+			if (pushDrawOffset <= limit)
+				pushBackOffsetDir = DOWN;
+		} else {
+			pushDrawOffset += speed;
+			if (pushDrawOffset >= 0)
+				pushDrawOffset = 0;
+		}
+	}
+
+	protected void pushBack(int pushBackDir, int[][] lvlData, float speedMulti) {
+		float xSpeed = 0;
+		if (pushBackDir == LEFT)
+			xSpeed = -walkSpeed;
+		else
+			xSpeed = walkSpeed;
+
+		if (CanMoveHere(hitbox.x + xSpeed * speedMulti, hitbox.y, hitbox.width, hitbox.height, lvlData))
+			hitbox.x += xSpeed * speedMulti;
+	}
+
+	protected void drawHitBox(Graphics g, int xLvlOffset, int yLvlOffset) {
 		g.drawRect((int) hitbox.x - xLvlOffset, (int) hitbox.y - yLvlOffset, (int) hitbox.width, (int) hitbox.height);
 	}
 
@@ -63,5 +97,9 @@ public abstract class Entity {
 	public int getAniIndex() {
 		return aniIndex;
 	}
-
+	protected void newState(int state) {
+		this.state = state;
+		aniTick = 0;
+		aniIndex = 0;
+	}
 }

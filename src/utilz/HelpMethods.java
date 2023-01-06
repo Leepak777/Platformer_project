@@ -54,7 +54,23 @@ public class HelpMethods {
 		float yIndex = y / GamePanel.TILE_SIZE;
 		return isTileSolid(xIndex, yIndex, lvlData);
 	}
+	public static boolean IsProjectileHittingLevel(Projectile p, int[][] lvlData) {
+		return isSolid(p.getHitbox().x + p.getHitbox().width / 2, p.getHitbox().y + p.getHitbox().height / 2, lvlData);
+	}
 
+	public static boolean IsEntityInWater(Rectangle2D.Float hitbox, int[][] lvlData) {
+		// Will only check if entity touch top water. Can't reach bottom water if not
+		// touched top water.
+		if (GetTileValue(hitbox.x, hitbox.y + hitbox.height, lvlData) != 48)
+			if (GetTileValue(hitbox.x + hitbox.width, hitbox.y + hitbox.height, lvlData) != 48)
+				return false;
+		return true;
+	}
+	private static int GetTileValue(float xPos, float yPos, int[][] lvlData) {
+		int xCord = (int) (xPos / GamePanel.TILE_SIZE);
+		int yCord = (int) (yPos / GamePanel.TILE_SIZE);
+		return lvlData[yCord][xCord];
+	}
 	public static boolean isEntityX(Rectangle2D.Float playerBox, float increase, ArrayList<Enemy> crabs) {
 		for (Enemy c : crabs) {
 			if (c.isActive()) {
@@ -96,11 +112,14 @@ public class HelpMethods {
 	private static boolean isTileSolid(float x, float y, int[][] lvlData) {
 
 		int value = lvlData[(int) y][(int) x];
-		if (value >= 48 || value < 0 || value != 11) {
+		switch (value) {
+		case 11, 48, 49:
+			return false;
+		default:
 			return true;
 		}
 
-		return false;
+		
 	}
 
 	public static float GetEntityXPosNextToWall(Rectangle2D.Float hitbox, float xSpeed, boolean hitEn) {
@@ -146,7 +165,12 @@ public class HelpMethods {
 			return isSolid(hitbox.x + xSpeed, hitbox.y + hitbox.height + 1, lvlData);
 		}
 	}
-
+	public static boolean isFloor(Rectangle2D.Float hitbox, int[][] lvlData) {
+		if (!isSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, lvlData))
+			if (!isSolid(hitbox.x, hitbox.y + hitbox.height + 1, lvlData))
+				return false;
+		return true;
+	}
 	public static boolean CanonSeePlayer(int[][] lvlData, Rectangle2D.Float hitbox, Rectangle2D.Float hitbox2,
 			int tileY) {
 		int firstXTile = (int) (hitbox.x / GamePanel.TILE_SIZE);

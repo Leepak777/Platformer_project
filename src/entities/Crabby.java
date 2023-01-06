@@ -14,7 +14,7 @@ import gamestates.Play;
 
 public class Crabby extends Enemy {
 
-	private int attackboxOffsetX;
+	
 
 	public Crabby(float x, float y, Play play) {
 		super(x, y, CRABBY_WIDTH, CRABBY_HEIGHT, CRABBY, play);
@@ -33,11 +33,6 @@ public class Crabby extends Enemy {
 		updateAttackBox();
 	}
 
-	private void updateAttackBox() {
-		attackbox.x = hitbox.x - attackboxOffsetX;
-		attackbox.y = hitbox.y;
-
-	}
 
 	private void updateBehaviour(int[][] lvlData, Player player) {
 		if (firstUpdate) {
@@ -70,6 +65,9 @@ public class Crabby extends Enemy {
 				}
 				break;
 			case HIT:
+				if (aniIndex <= GetSpriteAmount(enemyType, state) - 2)
+					pushBack(pushBackDir, lvlData, 2f);
+				updatePushBackDrawOffset();
 				break;
 			}
 		}

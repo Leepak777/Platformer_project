@@ -17,6 +17,7 @@ public class GamePanel extends JPanel {
 	private Game game;
 	private Play play;
 	private Menu menu;
+	private Credits credits;
 	private AudioOptions audioOp;
 	private GameOptions gameOp;
 	private AudioPlayer audioPlay;
@@ -33,6 +34,7 @@ public class GamePanel extends JPanel {
 		this.game = game;
 		play = new Play(this);
 		menu = new Menu(this);
+		credits = new Credits(this);
 		mouseInputs = new MouseInputs(this);
 		key = new KeyboardInputs(this);
 		gameOp = new GameOptions(this);
@@ -62,6 +64,9 @@ public class GamePanel extends JPanel {
 		case OPTIONS:
 			gameOp.update();
 			break;
+		case CREDIT:
+			credits.update();
+			break;
 		case QUIT:
 		default:
 			System.exit(0);
@@ -82,6 +87,9 @@ public class GamePanel extends JPanel {
 			break;
 		case OPTIONS:
 			gameOp.draw(g);
+			break;
+		case CREDIT:
+			credits.draw(g);
 			break;
 		default:
 			break;
@@ -128,6 +136,5 @@ public class GamePanel extends JPanel {
 	public AudioPlayer getAudioPlay() {
 		return audioPlay;
 	}
-	
 
 }

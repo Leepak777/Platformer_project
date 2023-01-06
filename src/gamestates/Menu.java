@@ -6,12 +6,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
+import main.Game;
 import main.GamePanel;
 import ui.MenuButton;
 import utilz.LoadSave;
 
 public class Menu extends State implements StateMethods {
-	private MenuButton[] buttons = new MenuButton[3];
+	private MenuButton[] buttons = new MenuButton[4];
 	private BufferedImage backgroundImg;
 	private BufferedImage background;
 	private int menuX, menuY, menuWIDTH, menuHEIGHT;
@@ -33,9 +34,10 @@ public class Menu extends State implements StateMethods {
 	}
 
 	private void loadButtons() {
-		buttons[0] = new MenuButton(GamePanel.GAME_WIDTH / 2, (int) (150 * GamePanel.SCALE), 0, GameState.PLAYING);
-		buttons[1] = new MenuButton(GamePanel.GAME_WIDTH / 2, (int) (220 * GamePanel.SCALE), 1, GameState.OPTIONS);
-		buttons[2] = new MenuButton(GamePanel.GAME_WIDTH / 2, (int) (290 * GamePanel.SCALE), 2, GameState.QUIT);
+		buttons[0] = new MenuButton(GamePanel.GAME_WIDTH / 2, (int) (130 * GamePanel.SCALE), 0, GameState.PLAYING);
+		buttons[1] = new MenuButton(GamePanel.GAME_WIDTH / 2, (int) (200 * GamePanel.SCALE), 1, GameState.OPTIONS);
+		buttons[2] = new MenuButton(GamePanel.GAME_WIDTH / 2, (int) (270 * GamePanel.SCALE), 3, GameState.CREDIT);
+		buttons[3] = new MenuButton(GamePanel.GAME_WIDTH / 2, (int) (340 * GamePanel.SCALE), 2, GameState.QUIT);
 	}
 
 	@Override

@@ -14,14 +14,24 @@ import gamestates.Play;
 public class LevelManager {
 	private Play play;
 	private BufferedImage[] levelSprite;
+	private BufferedImage[] waterSprite;
 	private ArrayList<Level> lvls;
-	private int lvlIndex = 0;
+	private int lvlIndex = 0, aniTick, aniIndex;
 
 	public LevelManager(Play play) {
 		this.play = play;
 		importOutsideSprite();
+		createWater();
 		lvls = new ArrayList<>();
 		buildAllLevels();
+	}
+
+	private void createWater() {
+		waterSprite = new BufferedImage[5];
+		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.WATER_TOP);
+		for (int i = 0; i < 4; i++)
+			waterSprite[i] = img.getSubimage(i * 32, 0, 32, 32);
+		waterSprite[4] = LoadSave.GetSpriteAtlas(LoadSave.WATER_BOTTOM);
 	}
 
 	private void buildAllLevels() {
@@ -44,13 +54,18 @@ public class LevelManager {
 	}
 
 	public void draw(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (int j = 0; j < lvls.get(lvlIndex).getLevelData().length; j++) {
+		for (int j = 0; j < GamePanel.TILES_IN_HEIGHT; j++)
 			for (int i = 0; i < lvls.get(lvlIndex).getLevelData()[0].length; i++) {
-				int index = lvls.get(lvlIndex).getSpriteIndex(i, (j));
-				g.drawImage(levelSprite[index], GamePanel.TILE_SIZE * i - xLvlOffset,
-						j * GamePanel.TILE_SIZE - yLvlOffset, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, null);
+				int index = lvls.get(lvlIndex).getSpriteIndex(i, j);
+				int x = GamePanel.TILE_SIZE * i - xLvlOffset;
+				int y = GamePanel.TILE_SIZE * j - yLvlOffset;
+				if (index == 48)
+					g.drawImage(waterSprite[aniIndex], x, y, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, null);
+				else if (index == 49)
+					g.drawImage(waterSprite[4], x, y, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, null);
+				else
+					g.drawImage(levelSprite[index], x, y, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, null);
 			}
-		}
 	}
 
 	public void update() {
@@ -79,11 +94,11 @@ public class LevelManager {
 
 	public void loadNextLevel() {
 		lvlIndex++;
-		if (lvlIndex >= lvls.size()) {
+		/*if (lvlIndex >= lvls.size()) {
 			lvlIndex = 0;
 			System.out.println("All Levels Completed");
 			GameState.state = GameState.MENU;
-		}
+		}*/
 		Level newLevel = lvls.get(lvlIndex);
 		play.getEM().LoadEnemies(newLevel);
 		play.getPlayer().loadlvlData(newLevel.getLevelData());

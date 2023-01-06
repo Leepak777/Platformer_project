@@ -13,32 +13,40 @@ import entities.Enemy;
 import entities.Player;
 import gamestates.Play;
 import levels.Level;
+import main.Game;
 import main.GamePanel;
 import utilz.LoadSave;
 
 public class ObjectManager {
 	private Play play;
 	private BufferedImage[][] potionImgs, containerImgs;
+	private BufferedImage[] canonImgs, grassImgs;
+	private BufferedImage[][] treeImgs;
 	private BufferedImage spikeImg, ballImg;
-	private BufferedImage[] canonImgs;
 	private ArrayList<Potion> potions;
 	private ArrayList<GameContainer> containers;
-	private ArrayList<Spike> spikes;
-	private ArrayList<Canon> canons;
 	private ArrayList<Projectile> balls = new ArrayList<>();
+	private Level currentLevel;
 
 	public ObjectManager(Play play) {
 		this.play = play;
+		currentLevel = play.getLevelM().getCurrentLevel();
 		loagImgs();
 
 	}
 
 	public void checkSpikesTouch(Player player) {
-		for (Spike s : spikes) {
+		for (Spike s : play.getLevelM().getCurrentLevel().getSpikes()) {
 			if (s.getHitbox().intersects(player.getHitbox())) {
-				player.changeHealthint(-1);
+				player.changeHealthint(-1, false);
 			}
 		}
+	}
+
+	public void checkSpikesTouched(Enemy e) {
+		for (Spike s : play.getLevelM().getCurrentLevel().getSpikes())
+			if (s.getHitbox().intersects(e.getHitbox()))
+				e.hurt(200);
 	}
 
 	public void checkObjectTouched(Rectangle2D.Float hitbox) {
@@ -54,7 +62,7 @@ public class ObjectManager {
 
 	public void applyEffectToPlayer(Potion p) {
 		if (p.getObjType() == RED_POTION) {
-			play.getPlayer().changeHealthint(RED_POTION_VALUE);
+			play.getPlayer().changeHealthint(RED_POTION_VALUE,false);
 		} else if (p.getObjType() == BLUE_POTION) {
 			play.getPlayer().changePower(BLUE_POTION_VALUE);
 		}
@@ -76,7 +84,7 @@ public class ObjectManager {
 			}
 		}
 		for (Projectile p : balls) {
-			if (p.isActive() ) {
+			if (p.isActive()) {
 				if (p.getHitbox().intersects(attackbox)) {
 					p.changeDir();
 					return;
@@ -87,14 +95,6 @@ public class ObjectManager {
 
 	public ArrayList<GameContainer> getContainers() {
 		return containers;
-	}
-
-	public ArrayList<Spike> getSpikes() {
-		return spikes;
-	}
-
-	public ArrayList<Canon> getCanons() {
-		return canons;
 	}
 
 	public ArrayList<Projectile> getBalls() {
@@ -124,9 +124,24 @@ public class ObjectManager {
 			canonImgs[i] = canonSprite.getSubimage(i * 40, 0, 40, 26);
 		}
 		ballImg = LoadSave.GetSpriteAtlas(LoadSave.BALL_ATLAS);
+
+		treeImgs = new BufferedImage[2][4];
+		BufferedImage treeOneImg = LoadSave.GetSpriteAtlas(LoadSave.TREE_ONE_ATLAS);
+		for (int i = 0; i < 4; i++)
+			treeImgs[0][i] = treeOneImg.getSubimage(i * 39, 0, 39, 92);
+
+		BufferedImage treeTwoImg = LoadSave.GetSpriteAtlas(LoadSave.TREE_TWO_ATLAS);
+		for (int i = 0; i < 4; i++)
+			treeImgs[1][i] = treeTwoImg.getSubimage(i * 62, 0, 62, 54);
+
+		BufferedImage grassTemp = LoadSave.GetSpriteAtlas(LoadSave.GRASS_ATLAS);
+		grassImgs = new BufferedImage[2];
+		for (int i = 0; i < grassImgs.length; i++)
+			grassImgs[i] = grassTemp.getSubimage(32 * i, 0, 32, 32);
 	}
 
 	public void update() {
+		updateBackgroundTrees();
 		for (Potion p : potions) {
 			if (p.isActive()) {
 				p.update();
@@ -141,28 +156,34 @@ public class ObjectManager {
 		updateProjectiles(play.getLevelM().getCurrentLevel().getLevelData(), play.getPlayer(), play.getEnemylst());
 	}
 
+	private void updateBackgroundTrees() {
+		for (BackgroundTree bt : currentLevel.getTrees())
+			bt.update();
+	}
+
 	private void checkHitEn(Projectile b, ArrayList<Enemy> en) {
-		for(Enemy e: en) {
-			if(e.isActive()) {
-				if(e.getHitbox().intersects(b.getHitbox())) {
+		for (Enemy e : en) {
+			if (e.isActive()) {
+				if (e.getHitbox().intersects(b.getHitbox())) {
 					e.hurt(100);
 					b.setActive(false);
 				}
 			}
 		}
 	}
+
 	private void updateProjectiles(int[][] levelData, Player player, ArrayList<Enemy> en) {
 		for (Projectile b : balls) {
 			if (b.isActive()) {
 				b.updatePos();
 				if (b.getHitbox().intersects(player.getHitbox())) {
-					player.changeHealthint(-10);
+					player.changeHealthint(-10, true);
 					player.setFallMove(false);
 					player.setFall();
 					b.setActive(false);
 				} else if (IsBallHittingLevel(b, levelData)) {
 					b.setActive(false);
-				}else {
+				} else {
 					checkHitEn(b, en);
 				}
 			}
@@ -172,7 +193,7 @@ public class ObjectManager {
 	}
 
 	private void updateCanons(int[][] lvlData, Player player) {
-		for (Canon c : canons) {
+		for (Canon c : play.getLevelM().getCurrentLevel().getCannons()) {
 			if (!c.doAnimation) {
 				if (c.getTileY() == player.getTileY()) {
 					if (isPlayerInRange(c, player)) {
@@ -223,6 +244,26 @@ public class ObjectManager {
 		drawTraps(g, xLvlOffset, yLvlOffset);
 		drawCanons(g, xLvlOffset, yLvlOffset);
 		drawBalls(g, xLvlOffset, yLvlOffset);
+		drawGrass(g, xLvlOffset, yLvlOffset);
+		drawBackgroundTrees(g, xLvlOffset, yLvlOffset);
+	}
+
+	private void drawGrass(Graphics g, int xLvlOffset, int yLvlOffset) {
+		for (Grass grass : currentLevel.getGrass())
+			g.drawImage(grassImgs[grass.getType()], grass.getX() - xLvlOffset, grass.getY()- yLvlOffset, (int) (32 * GamePanel.SCALE),
+					(int) (32 * GamePanel.SCALE), null);
+	}
+
+	public void drawBackgroundTrees(Graphics g, int xLvlOffset, int yLvlOffset) {
+		for (BackgroundTree bt : currentLevel.getTrees()) {
+
+			int type = bt.getType();
+			if (type == 9)
+				type = 8;
+			g.drawImage(treeImgs[type - 7][bt.getAniIndex()], bt.getX() - xLvlOffset + GetTreeOffsetX(bt.getType()),
+					(int) (bt.getY()- yLvlOffset + GetTreeOffsetY(bt.getType())), GetTreeWidth(bt.getType()),
+					GetTreeHeight(bt.getType()), null);
+		}
 	}
 
 	private void drawBalls(Graphics g, int xLvlOffset, int yLvlOffset) {
@@ -236,7 +277,7 @@ public class ObjectManager {
 	}
 
 	private void drawCanons(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Canon c : canons) {
+		for (Canon c : play.getLevelM().getCurrentLevel().getCannons()) {
 			int x = (int) (c.getHitbox().x - xLvlOffset);
 			int width = CANON_WIDTH;
 
@@ -252,7 +293,7 @@ public class ObjectManager {
 	}
 
 	private void drawTraps(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Spike s : spikes) {
+		for (Spike s : play.getLevelM().getCurrentLevel().getSpikes()) {
 			g.drawImage(spikeImg, (int) (s.getHitbox().x - xLvlOffset),
 					(int) (s.getHitbox().y - s.getyDrawOffset() - yLvlOffset), SPIKE_WIDTH, SPIKE_HEIGHT, null);
 		}
@@ -260,10 +301,9 @@ public class ObjectManager {
 	}
 
 	public void loadObjects(Level newLevel) {
+		currentLevel = newLevel;
 		potions = new ArrayList<>(newLevel.getPotions());
-		spikes = new ArrayList<>(newLevel.getSpikes());
 		containers = new ArrayList<>(newLevel.getContainers());
-		canons = new ArrayList<>(newLevel.getCanons());
 		balls.clear();
 	}
 
@@ -309,10 +349,10 @@ public class ObjectManager {
 		for (GameContainer gc : containers) {
 			gc.reset();
 		}
-		for (Canon c : canons) {
+		for (Canon c : currentLevel.getCannons()) {
 			c.reset();
 		}
-		System.out.println("Array Size after: " + potions.size() + " - " + containers.size());
+		//System.out.println("Array Size after: " + potions.size() + " - " + containers.size());
 	}
 
 }
