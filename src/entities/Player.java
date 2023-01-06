@@ -81,7 +81,7 @@ public class Player extends Entity {
 	public Player(float x, float y, int width, int height, Play play) {
 		super(x, y, width, height, play);
 		this.state = IDLE;
-		this.maxHealth = 100;
+		this.maxHealth = 1000;
 		this.currentHealth = maxHealth;
 		this.walkSpeed = 1.000069f * GamePanel.SCALE;
 		loadAnimations();

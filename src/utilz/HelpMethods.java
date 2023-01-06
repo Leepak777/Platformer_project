@@ -2,8 +2,6 @@ package utilz;
 
 import static utilz.Constants.EnemyConstants.CRABBY;
 
-
-
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
@@ -54,6 +52,7 @@ public class HelpMethods {
 		float yIndex = y / GamePanel.TILE_SIZE;
 		return isTileSolid(xIndex, yIndex, lvlData);
 	}
+
 	public static boolean IsProjectileHittingLevel(Projectile p, int[][] lvlData) {
 		return isSolid(p.getHitbox().x + p.getHitbox().width / 2, p.getHitbox().y + p.getHitbox().height / 2, lvlData);
 	}
@@ -66,11 +65,13 @@ public class HelpMethods {
 				return false;
 		return true;
 	}
+
 	private static int GetTileValue(float xPos, float yPos, int[][] lvlData) {
 		int xCord = (int) (xPos / GamePanel.TILE_SIZE);
 		int yCord = (int) (yPos / GamePanel.TILE_SIZE);
 		return lvlData[yCord][xCord];
 	}
+
 	public static boolean isEntityX(Rectangle2D.Float playerBox, float increase, ArrayList<Enemy> crabs) {
 		for (Enemy c : crabs) {
 			if (c.isActive()) {
@@ -88,7 +89,7 @@ public class HelpMethods {
 
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -106,20 +107,24 @@ public class HelpMethods {
 
 		return false;
 	}
+
 	public static boolean IsBallHittingLevel(Projectile b, int[][] levelData) {
-		return isSolid(b.getHitbox().x + b.getHitbox().width/2,b.getHitbox().y + b.getHitbox().height/2, levelData);
+		return isSolid(b.getHitbox().x + b.getHitbox().width / 2, b.getHitbox().y + b.getHitbox().height / 2,
+				levelData);
 	}
+
 	private static boolean isTileSolid(float x, float y, int[][] lvlData) {
 
 		int value = lvlData[(int) y][(int) x];
-		switch (value) {
-		case 11, 48, 49:
-			return false;
-		default:
+		/*
+		 * switch (value) { case 11, 48, 49: return false; default: return true; }
+		 */
+		if (value >= 48 || value < 0 || value != 11) {
 			return true;
 		}
 
-		
+		return false;
+
 	}
 
 	public static float GetEntityXPosNextToWall(Rectangle2D.Float hitbox, float xSpeed, boolean hitEn) {
@@ -165,12 +170,14 @@ public class HelpMethods {
 			return isSolid(hitbox.x + xSpeed, hitbox.y + hitbox.height + 1, lvlData);
 		}
 	}
+
 	public static boolean isFloor(Rectangle2D.Float hitbox, int[][] lvlData) {
 		if (!isSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, lvlData))
 			if (!isSolid(hitbox.x, hitbox.y + hitbox.height + 1, lvlData))
 				return false;
 		return true;
 	}
+
 	public static boolean CanonSeePlayer(int[][] lvlData, Rectangle2D.Float hitbox, Rectangle2D.Float hitbox2,
 			int tileY) {
 		int firstXTile = (int) (hitbox.x / GamePanel.TILE_SIZE);

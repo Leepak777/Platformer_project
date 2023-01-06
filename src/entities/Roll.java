@@ -30,7 +30,6 @@ public class Roll extends Enemy {
 	public void update(int[][] lvlData, Player player) {
 		updateBehavior(lvlData, play);
 		updateAnimationTick();
-		updateAttackBox();
 	}
 
 	private void updateBehavior(int[][] lvlData, Play playing) {

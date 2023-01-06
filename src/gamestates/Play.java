@@ -121,9 +121,11 @@ public class Play extends State implements StateMethods {
 	}
 
 	public void loadNextLevel() {
+		levelM.setLevelIndex(levelM.getLvlIndex() + 1);
 		levelM.loadNextLevel();
 		player.setSpawn(levelM.getCurrentLevel().getPlayerPoint());
 		resetAll();
+		drawShip = false;
 	}
 
 	private void loadStartLevel() {
@@ -140,10 +142,8 @@ public class Play extends State implements StateMethods {
 		levelM = new LevelManager(this);
 		EM = new EnemyManager(this);
 		OM = new ObjectManager(this);
-		player = new Player((levelM.getPixelWidth() - 8) * GamePanel.TILE_SIZE,
-				(levelM.getPixelHeight() - 8) * GamePanel.TILE_SIZE, (int) (64 * GamePanel.SCALE),
-				(int) (40 * GamePanel.SCALE), this);
-		player.loadlvlData(levelM.getCurrentLevel().getLevelData());
+		player = new Player(200, 200, (int) (64 * GamePanel.SCALE), (int) (40 * GamePanel.SCALE), this);
+		player.loadLvlData(levelM.getCurrentLevel().getLevelData());
 		player.setSpawn(levelM.getCurrentLevel().getPlayerPoint());
 
 		pauseOverlay = new PauseOverLay(this);
@@ -539,16 +539,17 @@ public class Play extends State implements StateMethods {
 	}
 
 	public void setLevelCompleted(boolean b) {
-		this.lvlCompleted = b;
-		if (b) {
-			lvlCompleted();
+		gp.getAudioPlay().lvlCompleted();
+		if (levelM.getLvlIndex() + 1 >= levelM.getAmountOfLevels()) {
+			// No more levels
+			gameCompleted = true;
+			levelM.setLevelIndex(0);
+			levelM.loadNextLevel();
+			resetAll();
+			return;
 		}
+		this.lvlCompleted = lvlCompleted;
 
-	}
-
-	private void lvlCompleted() {
-		gp.getAudioPlay().stopSong();
-		gp.getAudioPlay().playEffect(AudioPlayer.LVL_COMPLETED);
 	}
 
 	public ObjectManager getOM() {

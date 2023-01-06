@@ -2,6 +2,7 @@ package entities;
 
 import main.GamePanel;
 
+import static utilz.Constants.Dialogue.EXCLAMATION;
 import static utilz.Constants.Directions.*;
 import static utilz.Constants.EnemyConstants.*;
 import static utilz.HelpMethods.*;
@@ -13,8 +14,6 @@ import java.awt.geom.Rectangle2D;
 import gamestates.Play;
 
 public class Crabby extends Enemy {
-
-	
 
 	public Crabby(float x, float y, Play play) {
 		super(x, y, CRABBY_WIDTH, CRABBY_HEIGHT, CRABBY, play);
@@ -33,27 +32,32 @@ public class Crabby extends Enemy {
 		updateAttackBox();
 	}
 
-
 	private void updateBehaviour(int[][] lvlData, Player player) {
 		if (firstUpdate) {
 			firstUpdateCheck(lvlData);
 		}
 		if (inAir) {
-			updateInAir(lvlData);
-
+			// updateInAir(lvlData);
+			inAirChecks(lvlData, play);
 		} else {
 			switch (state) {
 			case IDLE:
-				newState(RUNNING);
+				if (isFloor(hitbox, lvlData))
+					newState(RUNNING);
+				else
+					inAir = true;
 				break;
 			case RUNNING: {
 				if (canSeePlayer(lvlData, player)) {
 					moveTowardPlayer(player);
 					if (isPlayerCloseAttack(player)) {
-						state = ATTACK;
+						newState(ATTACK);
 					}
 				}
 				move(lvlData);
+				if (inAir)
+					play.addDialogue((int) hitbox.x, (int) hitbox.y, EXCLAMATION);
+
 				break;
 			}
 			case ATTACK:

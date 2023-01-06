@@ -69,7 +69,18 @@ public class LevelManager {
 	}
 
 	public void update() {
+		updateWaterAnimation();
+	}
 
+	private void updateWaterAnimation() {
+		aniTick++;
+		if (aniTick >= 40) {
+			aniTick = 0;
+			aniIndex++;
+
+			if (aniIndex >= 4)
+				aniIndex = 0;
+		}
 	}
 
 	public Level getCurrentLevel() {
@@ -78,6 +89,10 @@ public class LevelManager {
 
 	public int getPixelHeight() {
 		return lvls.get(lvlIndex).getLevelData().length;
+	}
+
+	public void setLevelIndex(int lvlIndex) {
+		this.lvlIndex = lvlIndex;
 	}
 
 	public int getPixelWidth() {
@@ -92,13 +107,17 @@ public class LevelManager {
 		return lvlIndex;
 	}
 
+	public int getAmountOfLevels() {
+		return lvls.size();
+	}
+
 	public void loadNextLevel() {
-		lvlIndex++;
-		/*if (lvlIndex >= lvls.size()) {
-			lvlIndex = 0;
-			System.out.println("All Levels Completed");
-			GameState.state = GameState.MENU;
-		}*/
+		// lvlIndex++;
+		/*
+		 * if (lvlIndex >= lvls.size()) { lvlIndex = 0;
+		 * System.out.println("All Levels Completed"); GameState.state = GameState.MENU;
+		 * }
+		 */
 		Level newLevel = lvls.get(lvlIndex);
 		play.getEM().LoadEnemies(newLevel);
 		play.getPlayer().loadlvlData(newLevel.getLevelData());
