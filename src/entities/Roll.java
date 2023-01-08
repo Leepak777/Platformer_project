@@ -84,7 +84,7 @@ public class Roll extends Enemy {
 		if (hitbox.intersects(player.getHitbox()))
 			if (tickSinceLastDmgToPlayer >= 60) {
 				tickSinceLastDmgToPlayer = 0;
-				player.changeHealth(-GetEnemyDamage(enemyType), this);
+				player.changeHealth(-GetEnemyDamage(enemyType), this, null);
 			} else
 				tickSinceLastDmgToPlayer++;
 	}

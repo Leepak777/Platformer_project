@@ -34,6 +34,13 @@ public abstract class Enemy extends Entity {
 		this.walkSpeed = 0.5f * GamePanel.SCALE;
 	}
 
+	// init
+	protected void initAttackBox(int w, int h, int attackBoxOffsetX) {
+		attackbox = new Rectangle2D.Float(x, y, (int) (w * GamePanel.SCALE), (int) (h * GamePanel.SCALE));
+		this.attackboxOffsetX = (int) (GamePanel.SCALE * attackBoxOffsetX);
+	}
+
+	// update
 	protected void updateAttackBox() {
 		attackbox.x = hitbox.x - attackboxOffsetX;
 		attackbox.y = hitbox.y;
@@ -48,25 +55,6 @@ public abstract class Enemy extends Entity {
 		attackbox.y = hitbox.y;
 	}
 
-	protected void initAttackBox(int w, int h, int attackBoxOffsetX) {
-		attackbox = new Rectangle2D.Float(x, y, (int) (w * GamePanel.SCALE), (int) (h * GamePanel.SCALE));
-		this.attackboxOffsetX = (int) (GamePanel.SCALE * attackBoxOffsetX);
-	}
-
-	protected void firstUpdateCheck(int[][] lvlData) {
-		if (!onFloor(hitbox, lvlData)) {
-			inAir = true;
-		}
-		firstUpdate = false;
-	}
-	protected void inAirChecks(int[][] lvlData, Play playing) {
-		if (state != HIT && state != DEAD) {
-			updateInAir(lvlData);
-			playing.getOM().checkSpikesTouched(this);
-			if (IsEntityInWater(hitbox, lvlData))
-				hurt(maxHealth);
-		}
-	}
 	protected void updateInAir(int[][] lvlData) {
 		if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
 			hitbox.y += airSpeed;
@@ -96,7 +84,6 @@ public abstract class Enemy extends Entity {
 		changeWalkDir();
 	}
 
-
 	public void hurt(int amount) {
 		currentHealth -= amount;
 		if (currentHealth <= 0 && !dead) {
@@ -113,18 +100,6 @@ public abstract class Enemy extends Entity {
 		}
 	}
 
-	protected void checkPlayerHit(Rectangle2D attackbox, Player player) {
-		if (attackbox.intersects(player.hitbox)) {
-			player.changeHealth(-GetEnemyDamage(enemyType), this);
-		} else {
-			if (enemyType == SHARK)
-				return;
-
-		}
-		attackCheck = true;
-
-	}
-
 	protected void moveTowardPlayer(Player player) {
 		if (player.hitbox.x > hitbox.x) {
 			walkDir = RIGHT;
@@ -132,37 +107,6 @@ public abstract class Enemy extends Entity {
 			walkDir = LEFT;
 		}
 	}
-
-	protected boolean canSeePlayer(int[][] lvlData, Player player) {
-		int playerTileY = (int) (player.getHitbox().y / GamePanel.TILE_SIZE);
-		if (playerTileY == tileY) {
-			if (playerInRange(player)) {
-				if (isSightClear(lvlData, hitbox, player.hitbox, tileY)) {
-					return true;
-
-				}
-			}
-		}
-
-		return false;
-	}
-
-	protected boolean playerInRange(Player player) {
-		int absValue = (int) Math.abs(player.hitbox.x - this.hitbox.x);
-		return absValue <= attackDistance * 4;
-	}
-
-	protected boolean isPlayerCloseAttack(Player player) {
-		int absValue = (int) Math.abs(player.hitbox.x - this.hitbox.x);
-		switch (enemyType) {
-		case CRABBY -> {
-			return absValue <= attackDistance;
-		}
-		case SHARK -> {
-			return absValue <= attackDistance * 2;
-		}
-		}
-		return false;	}
 
 	protected void updateAnimationTick() {
 		aniTick++;
@@ -202,6 +146,67 @@ public abstract class Enemy extends Entity {
 
 	}
 
+	// check
+	protected void firstUpdateCheck(int[][] lvlData) {
+		if (!onFloor(hitbox, lvlData)) {
+			inAir = true;
+		}
+		firstUpdate = false;
+	}
+
+	protected void inAirChecks(int[][] lvlData, Play playing) {
+		if (state != HIT && state != DEAD) {
+			updateInAir(lvlData);
+			playing.getOM().checkSpikesTouched(this);
+			if (IsEntityInWater(hitbox, lvlData))
+				hurt(maxHealth);
+		}
+	}
+
+	protected void checkPlayerHit(Rectangle2D attackbox, Player player) {
+		if (attackbox.intersects(player.hitbox)) {
+			player.changeHealth(-GetEnemyDamage(enemyType), this, null);
+		} else {
+			if (enemyType == SHARK)
+				return;
+
+		}
+		attackCheck = true;
+
+	}
+
+	protected boolean canSeePlayer(int[][] lvlData, Player player) {
+		int playerTileY = (int) (player.getHitbox().y / GamePanel.TILE_SIZE);
+		if (playerTileY == tileY) {
+			if (playerInRange(player)) {
+				if (isSightClear(lvlData, hitbox, player.hitbox, tileY)) {
+					return true;
+
+				}
+			}
+		}
+
+		return false;
+	}
+
+	protected boolean playerInRange(Player player) {
+		int absValue = (int) Math.abs(player.hitbox.x - this.hitbox.x);
+		return absValue <= attackDistance * 4;
+	}
+
+	protected boolean isPlayerCloseAttack(Player player) {
+		int absValue = (int) Math.abs(player.hitbox.x - this.hitbox.x);
+		switch (enemyType) {
+		case CRABBY -> {
+			return absValue <= attackDistance;
+		}
+		case SHARK -> {
+			return absValue <= attackDistance * 2;
+		}
+		}
+		return false;
+	}
+
 	public boolean isActive() {
 		return active;
 	}
@@ -217,6 +222,7 @@ public abstract class Enemy extends Entity {
 		dead = false;
 		pushDrawOffset = 0;
 	}
+
 	public int flipX() {
 		if (walkDir == RIGHT)
 			return width;

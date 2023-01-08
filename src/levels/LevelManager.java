@@ -54,17 +54,20 @@ public class LevelManager {
 	}
 
 	public void draw(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (int j = 0; j < GamePanel.TILES_IN_HEIGHT; j++)
+		for (int j = 0; j < lvls.get(lvlIndex).getLevelData().length; j++)
 			for (int i = 0; i < lvls.get(lvlIndex).getLevelData()[0].length; i++) {
 				int index = lvls.get(lvlIndex).getSpriteIndex(i, j);
 				int x = GamePanel.TILE_SIZE * i - xLvlOffset;
 				int y = GamePanel.TILE_SIZE * j - yLvlOffset;
-				if (index == 48)
-					g.drawImage(waterSprite[aniIndex], x, y, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, null);
-				else if (index == 49)
-					g.drawImage(waterSprite[4], x, y, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, null);
-				else
+				
+				if (index < 48 && index >= 0) {
 					g.drawImage(levelSprite[index], x, y, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, null);
+				} else if (index == 48) {
+					g.drawImage(waterSprite[aniIndex], x, y, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, null);
+				} else if (index == 49) {
+					g.drawImage(waterSprite[4], x, y, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, null);
+				}
+
 			}
 	}
 
@@ -99,10 +102,6 @@ public class LevelManager {
 		return lvls.get(lvlIndex).getLevelData()[0].length;
 	}
 
-	public int getLvlAmount() {
-		return lvls.size();
-	}
-
 	public int getLvlIndex() {
 		return lvlIndex;
 	}
@@ -112,12 +111,6 @@ public class LevelManager {
 	}
 
 	public void loadNextLevel() {
-		// lvlIndex++;
-		/*
-		 * if (lvlIndex >= lvls.size()) { lvlIndex = 0;
-		 * System.out.println("All Levels Completed"); GameState.state = GameState.MENU;
-		 * }
-		 */
 		Level newLevel = lvls.get(lvlIndex);
 		play.getEM().LoadEnemies(newLevel);
 		play.getPlayer().loadlvlData(newLevel.getLevelData());

@@ -46,10 +46,10 @@ public class Play extends State implements StateMethods {
 	private Rain rain;
 	private int xLvlOffset;
 	private int yLvlOffset;
-	private int leftBorder = (int) (0.2 * GamePanel.GAME_WIDTH);
-	private int downBorder = (int) (0.2 * GamePanel.GAME_HEIGHT);
-	private int rightBorder = (int) (0.8 * GamePanel.GAME_WIDTH);
-	private int upBorder = (int) (0.8 * GamePanel.GAME_HEIGHT);
+	private int leftBorder = (int) (0.25 * GamePanel.GAME_WIDTH);
+	private int downBorder = (int) (0.25 * GamePanel.GAME_HEIGHT);
+	private int rightBorder = (int) (0.75 * GamePanel.GAME_WIDTH);
+	private int upBorder = (int) (0.75 * GamePanel.GAME_HEIGHT);
 	private int maxlvlOffsetX;
 	private int maxlvlOffsetY;
 	private BufferedImage background, big_cloud, small_cloud, shipImgs[];
@@ -58,8 +58,8 @@ public class Play extends State implements StateMethods {
 	private int[] smallCloudPos;
 	private Random rnd = new Random();
 	private boolean gameOver;
-	private boolean lvlCompleted = false;
-	private boolean playerDying = false;
+	private boolean lvlCompleted;
+	private boolean playerDying;
 	private boolean holdSpace = false;
 	private boolean drawRain;
 	private int code2;
@@ -166,14 +166,14 @@ public class Play extends State implements StateMethods {
 			gameCompletedOverlay.update();
 		else if (playerDying) {
 			player.update();
-		} else if (!gameOver) {
+		} else {
 			updateDialogue();
 			if (drawRain)
 				rain.update(xLvlOffset);
 			levelM.update();
+			OM.update();
 			player.update();
 			EM.update(levelM.getCurrentLevel().getLevelData(), player);
-			OM.update();
 			checkCloseBorder();
 			if (drawShip)
 				updateShipAni();
@@ -264,18 +264,20 @@ public class Play extends State implements StateMethods {
 	public void draw(Graphics g) {
 		g.drawImage(background, 0, 0, GamePanel.GAME_WIDTH, GamePanel.GAME_HEIGHT, null);
 		drawClouds(g);
-		if (drawRain)
-			rain.draw(g, xLvlOffset);
 
-		if (drawShip)
-			g.drawImage(shipImgs[shipAni], (int) (100 * GamePanel.SCALE) - xLvlOffset,
-					(int) ((288 * GamePanel.SCALE) + shipHeightDelta), (int) (78 * GamePanel.SCALE),
-					(int) (72 * GamePanel.SCALE), null);
-
+		/*
+		 * if (drawRain) rain.draw(g, xLvlOffset);
+		 */
+		/*
+		 * if (drawShip) g.drawImage(shipImgs[shipAni], (int) (100 * GamePanel.SCALE) -
+		 * xLvlOffset, (int) ((288 * GamePanel.SCALE) + shipHeightDelta - yLvlOffset),
+		 * (int) (78 * GamePanel.SCALE), (int) (72 * GamePanel.SCALE), null);
+		 */
 		levelM.draw(g, xLvlOffset, yLvlOffset);
-		player.render(g, xLvlOffset, yLvlOffset);
-		EM.draw(g, xLvlOffset, yLvlOffset);
 		OM.draw(g, xLvlOffset, yLvlOffset);
+		EM.draw(g, xLvlOffset, yLvlOffset);
+		player.render(g, xLvlOffset, yLvlOffset);
+		OM.drawBackgroundTrees(g, xLvlOffset, yLvlOffset);
 		drawDialogue(g, xLvlOffset);
 		if (paused) {
 			g.setColor(new Color(0, 0, 0, 150));
@@ -371,7 +373,7 @@ public class Play extends State implements StateMethods {
 		} else {
 			int code = e.getKeyCode();
 			if (code == KeyEvent.VK_A || code == KeyEvent.VK_D) {
-				if (holdSpace) {
+				if (holdSpace && !player.getpassTick()) {
 					player.updateJumpTick();
 					code2 = code;
 					passTickAct();
@@ -485,12 +487,12 @@ public class Play extends State implements StateMethods {
 
 	private void setDrawRainBoolean() {
 		// This method makes it rain 20% of the time you load a level.
-		if (rnd.nextFloat() >= 0.8f)
+		if (rnd.nextFloat() >= 0.99f)
 			drawRain = true;
 	}
 
 	public void checkObjectHit(Rectangle2D.Float attackbox) {
-		OM.checkObjectHit(attackbox);
+		OM.checkObjectHit(attackbox, player);
 	}
 
 	public void checkEnemyHit(Rectangle2D.Float attackbox, int amount) {
@@ -548,7 +550,7 @@ public class Play extends State implements StateMethods {
 			resetAll();
 			return;
 		}
-		this.lvlCompleted = lvlCompleted;
+		this.lvlCompleted = b;
 
 	}
 

@@ -64,6 +64,19 @@ public abstract class Entity {
 
 		if (CanMoveHere(hitbox.x + xSpeed * speedMulti, hitbox.y, hitbox.width, hitbox.height, lvlData))
 			hitbox.x += xSpeed * speedMulti;
+		
+		
+	}
+	
+	protected void jumpDir(int jumpDir, int[][] lvlData) {
+		float xSpeed = 0;
+		if (jumpDir == LEFT)
+			xSpeed = walkSpeed;
+		else
+			xSpeed = -walkSpeed;
+
+		if (CanMoveHere(hitbox.x + xSpeed , hitbox.y, hitbox.width, hitbox.height, lvlData))
+			hitbox.x += xSpeed;
 	}
 
 	protected void drawHitBox(Graphics g, int xLvlOffset, int yLvlOffset) {

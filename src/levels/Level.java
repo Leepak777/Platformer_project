@@ -53,7 +53,6 @@ public class Level {
 	public Level(BufferedImage img, Play play) {
 		this.play = play;
 		this.img = img;
-		calPlayerSpawn();
 		lvlData = new int[img.getHeight()][img.getWidth()];
 		loadLevel();
 		calLvlOffset();
@@ -79,10 +78,11 @@ public class Level {
 	}
 
 	private void loadLevelData(int redValue, int x, int y) {
-		if (redValue >= 50)
+		if (redValue >= 50) {
 			lvlData[y][x] = 0;
-		else
+		} else {
 			lvlData[y][x] = redValue;
+		}
 		switch (redValue) {
 		case 0, 1, 2, 3, 30, 31, 33, 34, 35, 36, 37, 38, 39 -> grass.add(new Grass((int) (x * GamePanel.TILE_SIZE),
 				(int) (y * GamePanel.TILE_SIZE) - GamePanel.TILE_SIZE, getRndGrassType(x)));
@@ -128,30 +128,6 @@ public class Level {
 		}
 	}
 
-	private void createCanon() {
-		canons = getCanonLst(img);
-
-	}
-
-	private void createSpike() {
-		spikes = getSpikeLst(img);
-	}
-
-	private void createObjects() {
-		potions = getPotionLst(img);
-		containers = getContainerLst(img);
-	}
-
-	private void calPlayerSpawn() {
-		playerSpawn = getPlayerSpawn(img);
-
-	}
-
-	private void createEnemies() {
-		enemies = getEnemies(img, play);
-
-	}
-
 	private void calLvlOffset() {
 		lvlTilesWide = img.getWidth();
 		maxTilesOffsetX = lvlTilesWide - GamePanel.TILES_IN_WIDTH;
@@ -159,10 +135,6 @@ public class Level {
 		lvlTilesHeight = img.getHeight();
 		maxTilesOffsetY = lvlTilesHeight - GamePanel.TILES_IN_HEIGHT;
 		maxlvlOffsetY = GamePanel.TILE_SIZE * maxTilesOffsetY;
-	}
-
-	private void createLevelData() {
-		lvlData = GetLevelData(img);
 	}
 
 	public int getSpriteIndex(int x, int y) {

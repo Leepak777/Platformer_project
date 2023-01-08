@@ -1,6 +1,7 @@
 package utilz;
 
 import main.Game;
+
 import main.GamePanel;
 
 public class Constants {
@@ -266,9 +267,9 @@ public class Constants {
 		public static int GetMaxHealth(int enemyType) {
 			switch (enemyType) {
 			case CRABBY:
-				return 50;
+				return 100;
 			case PINKSTAR, SHARK:
-				return 25;
+				return 75;
 			default:
 				return 1;
 			}
@@ -277,7 +278,7 @@ public class Constants {
 		public static int GetEnemyDamage(int enemyType) {
 			switch (enemyType) {
 			case CRABBY:
-				return 15;
+				return 10;
 			case PINKSTAR:
 				return 20;
 			case SHARK:

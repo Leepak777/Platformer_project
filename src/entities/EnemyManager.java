@@ -31,19 +31,19 @@ public class EnemyManager {
 
 	public void update(int[][] lvlData, Player player) {
 		boolean isAnyActive = false;
-		for (Crabby c : play.getLevelM().getCurrentLevel().getCrabs())
+		for (Crabby c : currentLevel.getCrabs())
 			if (c.isActive()) {
 				c.update(lvlData, player);
 				isAnyActive = true;
 			}
 
-		for (Roll p : play.getLevelM().getCurrentLevel().getPinkstars())
+		for (Roll p : currentLevel.getPinkstars())
 			if (p.isActive()) {
 				p.update(lvlData, player);
 				isAnyActive = true;
 			}
 
-		for (Shark s : play.getLevelM().getCurrentLevel().getSharks())
+		for (Shark s : currentLevel.getSharks())
 			if (s.isActive()) {
 				s.update(lvlData, play);
 				isAnyActive = true;
@@ -60,7 +60,7 @@ public class EnemyManager {
 	}
 
 	private void drawSharks(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Shark s : play.getLevelM().getCurrentLevel().getSharks())
+		for (Shark s : currentLevel.getSharks())
 			if (s.isActive()) {
 				g.drawImage(sharkArr[s.getState()][s.getAniIndex()],
 						(int) s.getHitbox().x - xLvlOffset - SHARK_DRAWOFFSET_X + s.flipX(),
@@ -72,7 +72,7 @@ public class EnemyManager {
 	}
 
 	private void drawPinkstars(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Roll p : play.getLevelM().getCurrentLevel().getPinkstars())
+		for (Roll p : currentLevel.getPinkstars())
 			if (p.isActive()) {
 				g.drawImage(pinkstarArr[p.getState()][p.getAniIndex()],
 						(int) p.getHitbox().x - xLvlOffset - PINKSTAR_DRAWOFFSET_X + p.flipX(),
@@ -83,7 +83,7 @@ public class EnemyManager {
 	}
 
 	private void drawCrabs(Graphics g, int xLvlOffset, int yLvlOffset) {
-		for (Crabby c : play.getLevelM().getCurrentLevel().getCrabs())
+		for (Crabby c : currentLevel.getCrabs())
 			if (c.isActive()) {
 
 				g.drawImage(crabbyArr[c.getState()][c.getAniIndex()],
@@ -127,11 +127,11 @@ public class EnemyManager {
 	}
 
 	public void resetAllEnemy() {
-		for (Crabby c : play.getLevelM().getCurrentLevel().getCrabs())
+		for (Crabby c : currentLevel.getCrabs())
 			c.resetEnemy();
-		for (Roll p : play.getLevelM().getCurrentLevel().getPinkstars())
+		for (Roll p : currentLevel.getPinkstars())
 			p.resetEnemy();
-		for (Shark s : play.getLevelM().getCurrentLevel().getSharks())
+		for (Shark s : currentLevel.getSharks())
 			s.resetEnemy();
 
 	}

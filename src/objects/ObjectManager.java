@@ -1,6 +1,7 @@
 package objects;
 
 import static utilz.Constants.ObjectsConstants.*;
+import static utilz.Constants.PlayerConstants.*;
 import static utilz.HelpMethods.*;
 import static utilz.Constants.Projectiles.*;
 
@@ -68,7 +69,7 @@ public class ObjectManager {
 		}
 	}
 
-	public void checkObjectHit(Rectangle2D.Float attackbox) {
+	public void checkObjectHit(Rectangle2D.Float attackbox, Player player) {
 		for (GameContainer gc : containers) {
 			if (gc.isActive() && !gc.doAnimation) {
 				if (gc.getHitbox().intersects(attackbox)) {
@@ -85,7 +86,7 @@ public class ObjectManager {
 		}
 		for (Projectile p : balls) {
 			if (p.isActive()) {
-				if (p.getHitbox().intersects(attackbox)) {
+				if (p.getHitbox().intersects(attackbox) && player.getState() == ATTACK) {
 					p.changeDir();
 					return;
 				}
@@ -177,7 +178,7 @@ public class ObjectManager {
 			if (b.isActive()) {
 				b.updatePos();
 				if (b.getHitbox().intersects(player.getHitbox())) {
-					player.changeHealthint(-10, true);
+					player.changeHealth(-10, null, b);
 					player.setFallMove(false);
 					player.setFall();
 					b.setActive(false);
